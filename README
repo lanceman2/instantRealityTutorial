@@ -1,0 +1,38 @@
+
+Q: What is this?
+
+A: Me trying to figure out InstantReality (http://instantreality.org),
+Given that most of the examples that come from that site just produce a
+plain black window.  If an example does not cause you to see something
+it's not a good example.  These examples don't do much, they are "hello
+World" like.  If they show a plain black window or just crash please let
+me know.
+
+My interest is to make an interface for InstantReality to drive our CAVE
+(Cube or whatever) here at Virginia Tech, room 3090 Torgersen Hall.
+InstantReality will not be the only way to use our CAVE.
+
+It does not appear that all X3D files are usable with InstantReality, for
+example the stuff at http://x3dgraphics.com that works with the current
+firefox (--version = 43.0 on Ubuntu, in particular xubuntu).
+
+
+The program `xmllint' can be used to check the xml based .x3d files.  For
+example run:
+
+  xmllint 11_multiWindow/multiWindow.x3d
+
+
+To get started run in this directory:
+
+   ./demo
+
+
+To remove generated files run:
+
+   make clean
+
+To build all the code without running the demo run:
+
+   make build
+

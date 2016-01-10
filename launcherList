@@ -1,0 +1,6 @@
+InstantPlayer 01_box/box.x3d
+InstantPlayer 03_teapot/teapot.x3d
+# This one needs to find a plugin in the directory
+cd 06_rotatingTeapot && InstantPlayer teapot.x3d
+cd 11_multiWindow && InstantPlayer multiWindow.x3d
+cd 15_multiWindowAndView && InstantPlayer multiWindowAndView.x3d

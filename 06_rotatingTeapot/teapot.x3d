@@ -1,0 +1,21 @@
+<X3D>
+  <Scene DEF='scene'>
+    <IOSensor DEF='rotationinput' type='Rotator'>
+      <field accessType='outputOnly' name='rotation'
+        type='SFRotation'/>
+    </IOSensor>
+    <GradientBackground position='0 1'
+      color='0 0.329 0.706 0 0.008 0.082'/>
+    <Viewpoint position='0 0 6'/>
+    <Transform DEF='movetrans' translation='0 0 0'>
+      <Shape>
+        <Appearance>
+          <material diffuseColor='0.9 0.1 0.1'/>
+        </Appearance>
+        <Teapot></Teapot>
+      </Shape>
+    </Transform>
+    <ROUTE fromNode='rotationinput' fromField='rotation'
+      toNode='movetrans' toField='set_rotation'/>
+  </Scene>
+</X3D>

@@ -1,0 +1,14 @@
+<X3D>
+  <scene DEF='scene'>
+    <GradientBackground position='0 1' color='0 0.329 0.706 0 0.008 0.082'/>
+    <Viewpoint position='0 0 5'/>
+    <transform translation="0 0 0">
+      <shape>
+        <appearance>
+          <material diffuseColor='0.7 0.7 0.8'></material>
+        </appearance>
+        <box></box>
+      </shape>
+    </transform>
+  </scene>
+</X3D>

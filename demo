@@ -1,0 +1,11 @@
+#!/bin/bash
+
+scriptdir="$(dirname ${BASH_SOURCE[0]})"
+cd "$scriptdir" || exit 1
+
+make || exit 1
+
+set -x
+qs_demo_launcher\
+ --list launcherList\
+ --title "My Instant Reality Tutorial Demos"
