@@ -4,8 +4,20 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})"
 cd "$scriptdir" || exit 1
 
 make || exit 1
+tmp=$(mktemp) || exit 1
+
+for dir in [0-9][0-9]_*/ ; do
+    cd $dir || exit 1
+    for model in *.x3d ; do
+        echo "cd $dir && InstantPlayer $model" >> $tmp
+    done
+    cd .. || exit 1
+done
 
 set -x
 qs_demo_launcher\
- --list launcherList\
- --title "My Instant Reality Tutorial Demos"
+ --list $tmp\
+ --title "My Instant Reality Tutorial Demos" &
+sleep 1
+rm "$tmp"
+wait
