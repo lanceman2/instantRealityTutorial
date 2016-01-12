@@ -3,7 +3,7 @@
     <GradientBackground position='0 1' color='0 0.329 0.706 0 0.008 0.082'/>
     <Viewpoint position='0 3 3' orientation='1 0 0 -0.8'/>
 
-    <transform translation='1 1 0'>
+    <transform translation='0 1 0'>
       <inline url='../axes.x3d'/>
     </transform>
 

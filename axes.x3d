@@ -10,21 +10,22 @@
           <cylinder radius='0.05' height='0.7'/>
         </shape>
       </transform>
-      <transform translation='0 0.7 0'>
+      <transform translation='0 0.825 0'>
         <shape>
           <appearance>
             <material diffuseColor='0 1 0'/>
           </appearance>
-          <cone bottomRadius='0.1' height='0.3'/>
+          <cone bottomRadius='0.1' height='0.35'/>
         </shape>
-      </transform>
+    </transform>
+    <!--
       <shape>
         <appearance>
           <material diffuseColor='1 1 1'/>
         </appearance>
         <sphere radius='0.06'/>
       </shape>
-
+    -->
       <transform rotation='0 0 1 -1.57079632679490'>
         <transform translation='0 0.35 0'>
           <shape>
@@ -34,12 +35,12 @@
             <cylinder radius='0.05' height='0.7'/>
           </shape>
         </transform>
-        <transform translation='0 0.7 0'>
+        <transform translation='0 0.825 0'>
           <shape>
             <appearance>
               <material diffuseColor='1 0 0'/>
             </appearance>
-            <cone bottomRadius='0.1' height='0.3'/>
+            <cone bottomRadius='0.1' height='0.35'/>
           </shape>
         </transform>
       </transform>
@@ -53,12 +54,12 @@
             <cylinder radius='0.05' height='0.7'/>
           </shape>
         </transform>
-        <transform translation='0 0.7 0'>
+        <transform translation='0 0.825 0'>
           <shape>
             <appearance>
               <material diffuseColor='0 0 1'/>
             </appearance>
-            <cone bottomRadius='0.1' height='0.3'/>
+            <cone bottomRadius='0.1' height='0.35'/>
           </shape>
         </transform>
       </transform>

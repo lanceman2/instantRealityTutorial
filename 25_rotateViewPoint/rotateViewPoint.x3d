@@ -1,0 +1,52 @@
+<?xml version='1.0'?>
+<X3D>
+    <!-- This example giggles the view point up and down and side to side
+        using C++ plugin setFrustum.cpp in this directory. -->
+    <Engine>
+        <RenderJob DEF='render'>
+            <WindowGroup>
+                <LocalWindow size='1000 1000' position='0 0' pipe=':0.0'>
+                    <Viewarea lowerLeft='0 0'
+                        upperRight='1 1'
+                        leftBuffer='TRUE'
+                        rightBuffer='FALSE'>
+                        <!-- surface points have to be counterclockwise
+                            starting with the lower left corner.  Not
+                            doing so will rotate your view which is okay
+                            if that's what you want. -->
+                        <ProjectionViewModifier DEF='view0'
+                            surface='-0.5 -0.5 -1, 0.5 -0.5 -1,
+                            0.5 0.5 -1, -0.5 0.5 -1'
+                            mono='TRUE' eyeSeparation='0'
+                            leftEye='TRUE' rightEye='FALSE'>
+                        </ProjectionViewModifier>
+                    </Viewarea>
+                </LocalWindow>
+            </WindowGroup>
+        </RenderJob>
+        <IOSensor DEF='setFrustum' type='setFrustum' isActive='TRUE'>
+            <!-- We tried changing the frustum surface in C++ code too, but
+                that function is not implemented in Instant Reality. -->
+            <field accessType='outputOnly' name='viewPoint' type='SFMatrix4f'/>
+        </IOSensor>
+
+        <ROUTE fromNode='setFrustum' fromField='viewPoint'
+            toNode='view0' toField='set_eyeTransform'/>
+
+    </Engine>
+
+    <Scene>
+        <Viewpoint position='0 0 0.8' rotation='0 1 0 1.578' description='close'/>
+        <Viewpoint position='0 0 10' description='far'/>
+
+        <shape>
+            <appearance>
+                <material diffuseColor='1 0 1'/>
+            </appearance>
+            <box size='0.1 0.1 0.1'/>
+        </shape>
+        <transform scale='1 1 1'>
+            <inline url='../axes.x3d'/>
+        </transform>
+    </Scene>
+</X3D>
