@@ -52,6 +52,7 @@ private:
     
     OutSlot<Matrix4f> *viewPointOutSlot_;
     Matrix4f viewPoint_;
+    float t;
   
     static NodeType type_;
 };
@@ -67,7 +68,7 @@ NodeType SetFrustum::type_(
     0/sizeof(Field));
 
 SetFrustum::SetFrustum() :
-    ThreadedNode()
+    ThreadedNode(), t(0)
 {
     SPEW();
     // Add external route
@@ -141,29 +142,26 @@ int SetFrustum::processData()
     assert(viewPointOutSlot_);
 
     // For stupid x-y dynamics.
-    const float max = 0.5F, step = 0.001F;
-    float y = 0, x = max/2;
-    int ud = -1, rl = 1;
+    // We change x and y values from -max to max
+#define PERIOD 15.0F // in seconds
+    const float omega = 2*M_PI/PERIOD,// in Hz
+          amp = 0.7F;
+    float z = 0, x = amp;
+    const int sleepStep = 10; // milliseconds
 
     // Important: waitThread() in every loop
     // time is in millisecond.  Not so regular rate.
-    while(waitThread(10))
+    while(waitThread(sleepStep))
     {
-        // Stupid x-y dynamics.
-        x += rl*step*1.14;
-        if(rl > 0 && x > max)
-          rl = -1;
-        else if(rl < 0 && x < -max)
-          rl = 1;
+        // Circle x-y dynamics.
+        t += sleepStep*0.001F; // t in seconds
+        x = amp*cosf(omega*t);
+        z = amp*sinf(omega*t);
 
-        y += ud*step;
-        if(ud > 0 && y > max)
-          ud = -1;
-        else if(ud < 0 && y < -max)
-          ud = 1;
-
-        viewPoint_.setTranslationAxisAngle(Vec3f(x,y,1), Vec3f(0,0,1), 0);
+        viewPoint_.setTranslationAxisAngle(Vec3f(x,0,z), Vec3f(0,0,1), 0);
         viewPointOutSlot_->push(viewPoint_);
+        if(t > PERIOD)
+            t -= PERIOD;
     }
 
     // Thread finished
