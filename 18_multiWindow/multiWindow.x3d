@@ -15,7 +15,7 @@
 
   <Scene>
     <GradientBackground position='0 1' color='0 0.329 0.706 0 0.008 0.082'/>
-    <Inline url='../tie.wrl'/>
+    <Inline url='../axes.x3d'/>
   </Scene>
 </X3D>
 
