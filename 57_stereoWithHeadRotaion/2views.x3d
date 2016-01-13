@@ -1,0 +1,60 @@
+<?xml version='1.0'?>
+<X3D>
+    <Engine>
+        <RenderJob DEF='render'>
+            <WindowGroup>
+
+                <LocalWindow position='0 0' size='1000 500'
+                    fullScreen='FALSE' pipe=':0.0' border='TRUE'
+                    drawCursor='TRUE' drawToolBar='TRUE'>
+
+                    <Viewarea lowerLeft='0 0' upperRight='500 500'
+                        leftBuffer='TRUE' rightBuffer='FALSE'>
+                        <ProjectionViewModifier DEF='left'
+                            surface='-1 -1 -1, 1 -1 -1, 1 1 -1, -1 1 -1'
+                            mono='FALSE' eyeSeparation='0.5'
+                            leftEye='TRUE' rightEye='FALSE'>
+                        </ProjectionViewModifier>
+                    </Viewarea>
+
+                    <Viewarea lowerLeft='500 0' upperRight='1000 500'
+                        leftBuffer='TRUE' rightBuffer='FALSE'>
+                        <ProjectionViewModifier DEF='right'
+                            surface='-1 -1 -1, 1 -1 -1, 1 1 -1, -1 1 -1'
+                            mono='FALSE' eyeSeparation='0.5'
+                            leftEye='FALSE' rightEye='TRUE'>
+                        </ProjectionViewModifier>
+                    </Viewarea>
+
+                </LocalWindow>
+
+            </WindowGroup>
+        </RenderJob>
+        <IOSensor DEF='setFrustum' type='setFrustum' isActive='TRUE'>
+            <field accessType='outputOnly' name='viewPoint' type='SFMatrix4f'/>
+        </IOSensor>
+
+        <ROUTE fromNode='setFrustum' fromField='viewPoint'
+            toNode='left' toField='set_eyeTransform'/>
+        <ROUTE fromNode='setFrustum' fromField='viewPoint'
+            toNode='right' toField='set_eyeTransform'/>
+
+    </Engine>
+
+    <Scene>
+        <Viewpoint position='0 0 0.8' description='close'/>
+        <Viewpoint position='0 0 4' description='far'/>
+        <Viewpoint position='0 0 0' description='origin'/>
+
+        <shape>
+            <appearance>
+                <material diffuseColor='1 0 1'/>
+            </appearance>
+            <box size='0.2 0.2 0.2'/>
+        </shape>
+        <transform scale='1 1 1'>
+            <inline url='../axes.x3d'/>
+            <inline url='../cubeFrame.x3d'/>
+        </transform>
+    </Scene>
+</X3D>

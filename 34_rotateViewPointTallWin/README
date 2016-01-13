@@ -1,9 +1,2 @@
-This is like standing in front of a projection wall and being head tracked
-while moving your head in a circle in the x-y plane.
-
-Try switching the camera to 'far' in the instantReality menu
-
-   Navigation => Cameras => far
-
-Note the instantReality changes your navigation when you switch camera
-views.
+Learn to scale your pixels in your displays by adjusting your frustum
+surface based on your view port sizes.
