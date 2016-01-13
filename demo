@@ -8,9 +8,13 @@ tmp=$(mktemp) || exit 1
 
 for dir in [0-9][0-9]_*/ ; do
     cd $dir || exit 1
-    for model in *.x3d ; do
-        echo "cd $dir && InstantPlayer $model" >> $tmp
-    done
+    if [ -x demo.bash ] ; then
+         echo "cd $dir && ./demo.bash" >> $tmp
+    else
+        for model in *.x3d ; do
+            echo "cd $dir && InstantPlayer $model" >> $tmp
+        done
+    fi
     cd .. || exit 1
 done
 
