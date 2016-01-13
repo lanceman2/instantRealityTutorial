@@ -86,7 +86,7 @@
       </appearance>
       <box size='0.1 0.1 0.1'/>
     </shape>
-    <transform scale='1 1 1'>
+    <transform rotation='0.57735 0.57735 0.57735 0.78540'>
       <inline url='../axes.x3d'/>
     </transform>
   </Scene>
