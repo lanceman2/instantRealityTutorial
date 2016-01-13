@@ -42,6 +42,7 @@
     </shape>
     <transform scale='1 1 1'>
       <inline url='../axes.x3d'/>
+      <inline url='../cubeFrame.x3d'/>
     </transform>
   </Scene>
 </X3D>

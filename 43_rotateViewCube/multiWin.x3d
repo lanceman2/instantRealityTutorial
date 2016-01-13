@@ -79,6 +79,7 @@
   <Scene>
     <Viewpoint position='0 0 0.5' description='close'/>
     <Viewpoint position='0 0 2' description='far'/>
+    <Viewpoint position='0 0 0' description='origin'/>
 
     <shape>
       <appearance>
@@ -86,8 +87,11 @@
       </appearance>
       <box size='0.1 0.1 0.1'/>
     </shape>
-    <transform rotation='0.57735 0.57735 0.57735 0.78540'>
+    <transform rotation='0.57735 0.57735 0.57735 0.78540'
+        translation='-0.5 -0.5 -0.5'>
       <inline url='../axes.x3d'/>
     </transform>
+    <inline url='../axes.x3d'/>
+    <inline url='../cubeFrame.x3d'/>
   </Scene>
 </X3D>
