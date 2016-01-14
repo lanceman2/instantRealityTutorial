@@ -55,7 +55,6 @@ private:
 
     OutSlot<Vec3f> *translationOutSlot_;
     OutSlot<Rotation> *rotationOutSlot_;
-    dtkCoord oldLoc;
   
     static NodeType type_;
 };
@@ -72,7 +71,7 @@ NodeType DtkShmMove::type_(
     0/sizeof(Field));
 
 DtkShmMove::DtkShmMove() :
-    ThreadedNode(), oldLoc(NAN, NAN, NAN, NAN, NAN, NAN)
+    ThreadedNode() 
 {
     SPEW();
     // Add external route
@@ -147,6 +146,19 @@ void DtkShmMove::shutdown()
     }
 }
 
+static inline
+bool IsSameOrSetFloat6(float x[6], const float y[6])
+{
+    int i;
+    for(i=0;i<6;++i)
+        if(x[i] != y[i])
+            break;
+    if(i == 6) return true; // they are the same
+    // cannot use sizeof(x) below.
+    memcpy(x, y, 6*sizeof(float));
+    return false;
+}
+
 // TODO: this code sucks, too much memory copying,
 // converting  to unnecessary intermediate forms
 // Thread method which gets automatically started as soon as a slot is
@@ -160,41 +172,52 @@ int DtkShmMove::processData()
     assert(translationOutSlot_);
     assert(rotationOutSlot_);
 
-    dtkCoord loc;
-    float location[6];
+    float loc[6];
+    float oldLoc[6] = { NAN, NAN, NAN, NAN, NAN, NAN };
     Vec3f translation;
     Rotation rotation;
-    dtkSharedMem* shm = new dtkSharedMem(sizeof(location), "teapot");
+    dtkMatrix mat;
+    dtkSharedMem* shm = new dtkSharedMem(sizeof(loc), "head");
     assert(shm);
     if(!shm) return 1; // fail
 
-    // Important: waitThread() in every loop
-    // time is in millisecond.  Not so regular rate.
+    // TODO: We should be waiting at the sharedMemory read call and
+    // not here.  That would give much better performance in so many
+    // ways.  Problem is, we have no easy way to interrupt the blocking
+    // shm->blockingRead(loc) call at quiting time.
     while(waitThread(10))
     {
-        // TODO: shm->blockingRead() YES YES YES
-        // TODO: This memcpy sucks.
-        if(shm->read(location))
-            // shm->read() should have spewed.
+       if(shm->read(loc)) // not blocking here like a good thread should not
+       // if(shm->blockingRead(loc)) // blocking here like a good thread should
+            // the above call should have spewed.
             return -1; // fail
-        loc.set(location);
 
         // TODO: convert units and tranform
         // TODO: Just moving viewpoint position for now
-        if(oldLoc == loc) continue;
-        oldLoc = loc;
+        if(IsSameOrSetFloat6(oldLoc, loc)) continue;
 
         // TODO: add a x,y,z, scaling.
 
-        dtkMatrix mat = dtkMatrix(loc);
-        //mat.rotateHPR( 0.0f, -90.0f, 0.0f );
-        
-        // fill in translation
-        mat.translate(&translation[0], &translation[1], &translation[2]);
-        // fill in rotation
-        mat.quat(&rotation[0], &rotation[1], &rotation[2], &rotation[3]);
-
+        // fill in InstantReality translation
+        translation.set(loc[0], loc[2], -loc[1]);
+        // send out the InstantReality translation
         translationOutSlot_->push(translation);
+
+        mat.identity();
+        // Unless you wrote the DTK matrix code yesterday forget about
+        // understanding this code without running the example in
+        // InstantPlayer.
+
+        // Through trial and error we found that we need to
+        // set up these three calls in this order.
+        // You cannot do this in one rotateHPR() call.
+        mat.rotateHPR(-loc[5], 0, 0);// Diverse Heading is minus InstantReality Roll
+        mat.rotateHPR(0, loc[4], 0); // Diverse Pitch is InstantReality Pitch
+        mat.rotateHPR(0, 0, loc[3]); // Diverse Roll is InstantReality Heading
+
+        // fill in InstantReality rotations in quaternions.
+        mat.quat(&rotation[0], &rotation[1], &rotation[2], &rotation[3]);
+        // send out the InstantReality rotation
         rotationOutSlot_->push(rotation);
     }
 

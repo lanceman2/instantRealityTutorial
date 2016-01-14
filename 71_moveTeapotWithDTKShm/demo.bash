@@ -4,7 +4,7 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})" || exit 1
 cd "$scriptdir" || exit 1
 ./build.bash || exit 1
 
-dtk-floatSliders teapot\
+dtk-floatSliders head\
  -N 6\
  -s 0 -1.2 1.2 0\
  -s 1 -1.2 1.2 0\

@@ -52,10 +52,8 @@ protected:
     virtual int processData ();
   
 private:
-    
+
     OutSlot<Matrix4f> *viewPointOutSlot_;
-    Matrix4f viewPoint_;
-    float t;
   
     static NodeType type_;
 };
@@ -72,7 +70,7 @@ NodeType DtkHead::type_(
     0/sizeof(Field));
 
 DtkHead::DtkHead() :
-    ThreadedNode(), t(0)
+    ThreadedNode()
 {
     SPEW();
     // Add external route
@@ -106,7 +104,7 @@ void DtkHead::initialize()
     Node::initialize();
 
     viewPointOutSlot_ = new OutSlot<Matrix4f>(
-        "changing frustum view points (apexes) via DTK shared memory", viewPoint_);
+        "changing frustum view points (apexes) via DTK shared memory", Matrix4f());
     assert(viewPointOutSlot_);
     viewPointOutSlot_->addListener(*this);
     addOutSlot("viewPoint", viewPointOutSlot_);
@@ -133,6 +131,19 @@ void DtkHead::shutdown()
     }
 }
 
+static inline
+bool IsSameOrSetFloat6(float x[6], const float y[6])
+{
+    int i;
+    for(i=0;i<6;++i)
+        if(x[i] != y[i])
+            break;
+    if(i == 6) return true; // they are the same
+    // cannot use sizeof(x) below.
+    memcpy(x, y, 6*sizeof(float));
+    return false;
+}
+
 // Thread method which gets automatically started as soon as a slot is
 // connected
 int DtkHead::processData()
@@ -143,38 +154,59 @@ int DtkHead::processData()
 
     assert(viewPointOutSlot_);
 
-    // For stupid x-y dynamics.
-    // We change x and y values from -max to max
-#define PERIOD 15.0F // in seconds
-    const float omega = 2*M_PI/PERIOD;// in Hz
-    const int sleepStep = 10; // milliseconds
-    const float amp = 0.8F;
-    float x = 0;
+    Matrix4f viewPoint;
     float loc[6];
-    dtkSharedMem* head = new dtkSharedMem(sizeof(loc), "head");
-    assert(head);
-    if(!head) return 1; // fail
+    float oldLoc[6] = { NAN, NAN, NAN, NAN, NAN, NAN };
+    Vec3f translation;
+    Rotation rotation;
+    dtkMatrix mat;
+    dtkSharedMem* shm = new dtkSharedMem(sizeof(loc), "head");
+    assert(shm);
+    if(!shm) return 1; // fail
 
-    // Important: waitThread() in every loop
-    // time is in millisecond.  Not so regular rate.
-    while(waitThread(sleepStep))
+    // TODO: We should be waiting at the sharedMemory read call and
+    // not here.  That would give much better performance in so many
+    // ways.  Problem is, we have no easy way to interrupt the blocking
+    // shm->blockingRead(loc) call at quiting time.
+    while(waitThread(10))
     {
-        float ang;
-        // Circle x-y dynamics.
-        t += sleepStep*0.001F; // t in seconds
-        x = amp*cosf(omega*t);
-        // TODO: head->blockingRead() YES YES YES
-        head->read(loc);
+       if(shm->read(loc)) // not blocking here like a good thread should not
+       // if(shm->blockingRead(loc)) // blocking here like a good thread should
+            // the above call should have spewed.
+            return -1; // fail
+
         // TODO: convert units and tranform
-        // TODO: Just moving viewpoint position for now 
-        viewPoint_.setTranslationAxisAngle(
-                Vec3f(loc[0],loc[1],loc[2]), Vec3f(0,1,0), 0);
-        viewPointOutSlot_->push(viewPoint_);
-        if(t > PERIOD)
-            t -= PERIOD;
+        // TODO: Just moving viewpoint position for now
+        if(IsSameOrSetFloat6(oldLoc, loc)) continue;
+
+        // TODO: add a x,y,z, scaling.
+
+        // fill in InstantReality translation
+        translation.set(loc[0], loc[2], -loc[1]);
+        // send out the InstantReality translation
+
+        mat.identity();
+        // Unless you wrote the DTK matrix code yesterday forget about
+        // understanding this code without running the example in
+        // InstantPlayer.
+
+        // Through trial and error we found that we need to
+        // set up these three calls in this order.
+        // You cannot do this in one rotateHPR() call.
+        mat.rotateHPR(-loc[5], 0, 0);// Diverse Heading is minus InstantReality Roll
+        mat.rotateHPR(0, loc[4], 0); // Diverse Pitch is InstantReality Pitch
+        mat.rotateHPR(0, 0, loc[3]); // Diverse Roll is InstantReality Heading
+
+        // fill in InstantReality rotations in quaternions.
+        mat.quat(&rotation[0], &rotation[1], &rotation[2], &rotation[3]);
+
+        viewPoint.setTransform(translation, rotation);
+
+        // send out the InstantReality transform view matrix
+        viewPointOutSlot_->push(viewPoint);
     }
 
-    delete head;
+    delete shm;
 
     // Thread finished
     setState(NODE_SLEEPING);

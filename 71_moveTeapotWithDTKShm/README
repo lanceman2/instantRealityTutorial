@@ -1,0 +1,17 @@
+This example InstantIO plugin reads DIVERSE position (x,y,z) and orientation
+(H,P,R or heading,pitch,roll in degrees) from shared memory, which is like
+head tracker data (at the Virginia Tech CAVE), and then converts it
+to InstantReality position (x,y,z) and orientation (quaternions).
+The two coordinate systems share the same origin but DIVERSE z is up
+and InstantReality y is up ... or
+
+DIVERSE x = InstantReality x
+DIVERSE z = InstantReality y
+DIVERSE y = InstantReality -z
+
+Run './demo.bash' and you'll see the DIVERSE origin marked by an axes set
+with (blue) z pointing up, and another axes the represents the position
+and orientation of the teapot in a more natural teapot InstantReality
+space.
+
+Move the sliders, view it, and understand...
