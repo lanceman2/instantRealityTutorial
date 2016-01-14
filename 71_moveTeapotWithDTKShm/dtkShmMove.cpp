@@ -55,6 +55,7 @@ private:
 
     OutSlot<Vec3f> *translationOutSlot_;
     OutSlot<Rotation> *rotationOutSlot_;
+    dtkCoord oldLoc;
   
     static NodeType type_;
 };
@@ -71,12 +72,11 @@ NodeType DtkShmMove::type_(
     0/sizeof(Field));
 
 DtkShmMove::DtkShmMove() :
-    ThreadedNode()
+    ThreadedNode(), oldLoc(NAN, NAN, NAN, NAN, NAN, NAN)
 {
     SPEW();
     // Add external route
     addExternalRoute("*", "{NamespaceLabel}/{SlotLabel}");
-
     SPEW();
 }
 
@@ -147,6 +147,8 @@ void DtkShmMove::shutdown()
     }
 }
 
+// TODO: this code sucks, too much memory copying,
+// converting  to unnecessary intermediate forms
 // Thread method which gets automatically started as soon as a slot is
 // connected
 int DtkShmMove::processData()
@@ -158,10 +160,11 @@ int DtkShmMove::processData()
     assert(translationOutSlot_);
     assert(rotationOutSlot_);
 
-    float loc[6];
+    dtkCoord loc;
+    float location[6];
     Vec3f translation;
     Rotation rotation;
-    dtkSharedMem* shm = new dtkSharedMem(sizeof(loc), "teapot");
+    dtkSharedMem* shm = new dtkSharedMem(sizeof(location), "teapot");
     assert(shm);
     if(!shm) return 1; // fail
 
@@ -171,16 +174,28 @@ int DtkShmMove::processData()
     {
         // TODO: shm->blockingRead() YES YES YES
         // TODO: This memcpy sucks.
-        shm->read(loc);
-        // TODO: convert units and tranform
-        // TODO: Just moving viewpoint position for now 
+        if(shm->read(location))
+            // shm->read() should have spewed.
+            return -1; // fail
+        loc.set(location);
 
-        translation.set(loc[0], loc[1], loc[2]);
-        //rotation.set(Vec3f(0,1,0), loc[3]*M_PI/180.0F);
-        //rotation.set(Vec3f(1,0,0), loc[4]*M_PI/180.0F);
-        rotation.set(Vec3f(0,0,-1), loc[5]*M_PI/180.0F);
-        rotationOutSlot_->push(rotation);
+        // TODO: convert units and tranform
+        // TODO: Just moving viewpoint position for now
+        if(oldLoc == loc) continue;
+        oldLoc = loc;
+
+        // TODO: add a x,y,z, scaling.
+
+        dtkMatrix mat = dtkMatrix(loc);
+        //mat.rotateHPR( 0.0f, -90.0f, 0.0f );
+        
+        // fill in translation
+        mat.translate(&translation[0], &translation[1], &translation[2]);
+        // fill in rotation
+        mat.quat(&rotation[0], &rotation[1], &rotation[2], &rotation[3]);
+
         translationOutSlot_->push(translation);
+        rotationOutSlot_->push(rotation);
     }
 
     delete shm;

@@ -6,6 +6,7 @@
     <Viewpoint description='close' position='0 0 2'/>
     <Viewpoint description='origin' position='0 0 0'/>
     <Transform DEF='moveteapot' translation='0 0 0'>
+      <inline url='../axes.x3d'/>
       <Shape>
         <Appearance>
           <material diffuseColor='0.9 0.1 0.1'/>
