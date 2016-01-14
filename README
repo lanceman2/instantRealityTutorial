@@ -20,7 +20,7 @@ firefox (--version = 43.0 on Ubuntu, in particular xubuntu).
 The program `xmllint' can be used to check the xml based .x3d files.  For
 example run:
 
-  xmllint 11_multiWindow/multiWindow.x3d
+  xmllint axes.x3d
 
 
 To get started run in this directory:

@@ -5,6 +5,7 @@ cd "$scriptdir" || exit 1
 ./build.bash || exit 1
 
 dtk-floatSliders head\
+ -N 6\
  -s 0 -1.2 1.2 0\
  -s 1 -1.2 1.2 0\
  -s 2 -1.2 1.2 0\
@@ -15,4 +16,4 @@ dtk-floatSliders head\
 
 [ "$?" = "0" ] || exit 1
 
-InstantPlayer 2views.x3d
+InstantPlayer stereoVeiw.3xd

@@ -1,0 +1,28 @@
+<X3D>
+  <Scene DEF='scene'>
+    <GradientBackground position='0 1'
+      color='0 0.329 0.706 0 0.008 0.082'/>
+    <Viewpoint description='far' position='0 0 6'/>
+    <Viewpoint description='close' position='0 0 2'/>
+    <Viewpoint description='origin' position='0 0 0'/>
+    <Transform DEF='moveteapot' translation='0 0 0'>
+      <Shape>
+        <Appearance>
+          <material diffuseColor='0.9 0.1 0.1'/>
+        </Appearance>
+        <Teapot></Teapot>
+      </Shape>
+    </Transform>
+
+    <IOSensor DEF='dtkShmMove' type='dtkShmMove'>
+      <field accessType='outputOnly' name='rotation' type='SFRotation'/>
+      <field accessType='outputOnly' name='translation' type='SFVec3f'/>
+    </IOSensor>
+
+    <ROUTE fromNode='dtkShmMove' fromField='rotation'
+      toNode='moveteapot' toField='set_rotation'/>
+    <ROUTE fromNode='dtkShmMove' fromField='translation'
+      toNode='moveteapot' toField='set_translation'/>
+  </Scene>
+
+</X3D>
