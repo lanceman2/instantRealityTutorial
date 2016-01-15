@@ -115,10 +115,6 @@ void DtkHead::shutdown()
     // handle state and namespace updates
     Node::shutdown();
 
-    // ###ADDCODE###
-    // remove all dynamic slots and do other cleanups
-    // setState (NODE_ERROR) on error
-
     SPEW();  
 
     assert(viewPointOutSlot_);
@@ -154,6 +150,8 @@ int DtkHead::processData()
 
     assert(viewPointOutSlot_);
 
+    //float scale = 1.524F; // for VT CAVE
+    float scale = 1.0F;
     float loc[6];
     float oldLoc[6] = { NAN, NAN, NAN, NAN, NAN, NAN };
     Vec3f translation;
@@ -169,12 +167,13 @@ int DtkHead::processData()
     // shm->blockingRead(loc) call at quiting time.
     while(waitThread(10))
     {
-       if(shm->read(loc)) // not blocking here like a good thread should not
-       // if(shm->blockingRead(loc)) // blocking here like a good thread should
-            // the above call should have spewed.
+        if(shm->read(loc)) // not blocking here like a good thread should not
+        //if(shm->blockingRead(loc)) // Would be better
+        //blocking here like a good thread should.
+            // The above shm->read() should have spewed about the error.
             return -1; // fail
-        
-        // TODO: convert units and tranform
+
+        // TODO: convert units and transform
         // TODO: Just moving viewpoint position for now
         if(IsSameOrSetFloat6(oldLoc, loc)) continue;
 
@@ -189,20 +188,21 @@ int DtkHead::processData()
 
         mat.identity();
         mat.rotateHPR(loc[3], loc[4], loc[5]);
-        mat.translate(loc[0], loc[1], loc[2]);
+        mat.translate(loc[0]*scale, loc[1]*scale, loc[2]*scale);
         mat.rotateHPR( 0.0f, -90.0F, 0.0F );
 
         // TODO: add a x,y,z, scaling.
 	
         Matrix4f tracker_mat;
 
-#if 1 // Both these methods give the same result
+#if 1 // Both these methods give the same result. Confirmed it.
+        // This method may be the faster of the two.
         int i, j;
 	for(i=0;i<4;++i)
 	    for(j=0; j<4; ++j)
 		tracker_mat[i*4+j] = mat.element(i, j);
         //mat.print(stderr);
-#else
+#else // Both these methods give the same result #if 1 or 0
 
         Vec3f tracker_pos;
 	mat.translate( &tracker_pos[0], &tracker_pos[1], &tracker_pos[2] );
