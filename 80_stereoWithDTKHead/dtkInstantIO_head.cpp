@@ -154,13 +154,12 @@ int DtkHead::processData()
 
     assert(viewPointOutSlot_);
 
-    Matrix4f viewPoint;
     float loc[6];
     float oldLoc[6] = { NAN, NAN, NAN, NAN, NAN, NAN };
     Vec3f translation;
     Rotation rotation;
     dtkMatrix mat;
-    dtkSharedMem* shm = new dtkSharedMem(sizeof(loc), "head");
+    dtkSharedMem* shm = new dtkSharedMem(6*sizeof(float), "head");
     assert(shm);
     if(!shm) return 1; // fail
 
@@ -174,36 +173,48 @@ int DtkHead::processData()
        // if(shm->blockingRead(loc)) // blocking here like a good thread should
             // the above call should have spewed.
             return -1; // fail
-
+        
         // TODO: convert units and tranform
         // TODO: Just moving viewpoint position for now
         if(IsSameOrSetFloat6(oldLoc, loc)) continue;
 
-        // TODO: add a x,y,z, scaling.
-
-        // fill in InstantReality translation
-        translation.set(loc[0], loc[2], -loc[1]);
-        // send out the InstantReality translation
+        // ===============================================================
+        // ======================== CAUTION ==============================
+        // ===============================================================
+        // Do not use dtkCoord to build this mat there is a nasty bug in
+        // the setting of dtkMatrix for a dtkCoord when using any of the
+        // dtkMatrix methods that do it.  Unless you like PAIN.
+        // Thu Jan 14 21:36:50 EST 2016
+        // ===============================================================
 
         mat.identity();
-        // Unless you wrote the DTK matrix code yesterday forget about
-        // understanding this code without running the example in
-        // InstantPlayer.
+        mat.rotateHPR(loc[3], loc[4], loc[5]);
+        mat.translate(loc[0], loc[1], loc[2]);
+        mat.rotateHPR( 0.0f, -90.0F, 0.0F );
 
-        // Through trial and error we found that we need to
-        // set up these three calls in this order.
-        // You cannot do this in one rotateHPR() call.
-        mat.rotateHPR(-loc[5], 0, 0);// Diverse Heading is minus InstantReality Roll
-        mat.rotateHPR(0, loc[4], 0); // Diverse Pitch is InstantReality Pitch
-        mat.rotateHPR(0, 0, loc[3]); // Diverse Roll is InstantReality Heading
+        // TODO: add a x,y,z, scaling.
+	
+        Matrix4f tracker_mat;
 
-        // fill in InstantReality rotations in quaternions.
-        mat.quat(&rotation[0], &rotation[1], &rotation[2], &rotation[3]);
+#if 1 // Both these methods give the same result
+        int i, j;
+	for(i=0;i<4;++i)
+	    for(j=0; j<4; ++j)
+		tracker_mat[i*4+j] = mat.element(i, j);
+        //mat.print(stderr);
+#else
 
-        viewPoint.setTransform(translation, rotation);
+        Vec3f tracker_pos;
+	mat.translate( &tracker_pos[0], &tracker_pos[1], &tracker_pos[2] );
+        Rotation tracker_rot;
+	mat.quat( &tracker_rot[0], &tracker_rot[1], &tracker_rot[2], &tracker_rot[3] );
 
-        // send out the InstantReality transform view matrix
-        viewPointOutSlot_->push(viewPoint);
+	tracker_mat.setTransform( tracker_pos[0], tracker_pos[1], tracker_pos[2],
+                tracker_rot[0], tracker_rot[1], tracker_rot[2], tracker_rot[3] );
+        tracker_mat.setTransform( tracker_pos, tracker_rot);
+#endif
+
+        viewPointOutSlot_->push(tracker_mat);
     }
 
     delete shm;
