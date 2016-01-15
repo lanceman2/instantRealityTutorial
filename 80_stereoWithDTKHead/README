@@ -1,0 +1,12 @@
+See example in ../71_moveTeapotWithDTKShm/ before this.
+
+Note when the objects are far away, past the view frustum base surface,
+and you change from H P R (heading, pitch, roll) from (0,0,0) to (20,0,0)
+increasing heading that your left eye is moving back from the screen
+making the relative size of the objects appear to fill more of the view,
+and so appear larger, but remember your frustum angle of view is
+decreasing at the same time your distance to the object is increasing
+which is not what happens in real life.  In real life your angle of
+view, or view frustum, or visual acuity, stays the same.  You must draw
+some triangles to understand this.
+
