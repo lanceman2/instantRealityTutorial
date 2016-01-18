@@ -206,9 +206,6 @@ int DtkHead::processData()
 	mat.translate( &tracker_pos[0], &tracker_pos[1], &tracker_pos[2] );
         Rotation tracker_rot;
 	mat.quat( &tracker_rot[0], &tracker_rot[1], &tracker_rot[2], &tracker_rot[3] );
-
-	tracker_mat.setTransform( tracker_pos[0], tracker_pos[1], tracker_pos[2],
-                tracker_rot[0], tracker_rot[1], tracker_rot[2], tracker_rot[3] );
         tracker_mat.setTransform( tracker_pos, tracker_rot);
 #endif
 
