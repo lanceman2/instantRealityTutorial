@@ -154,8 +154,6 @@ int DtkHead::processData()
     float scale = 1.0F;
     float loc[6];
     float oldLoc[6] = { NAN, NAN, NAN, NAN, NAN, NAN };
-    Vec3f translation;
-    Rotation rotation;
     dtkMatrix mat;
     dtkSharedMem* shm = new dtkSharedMem(6*sizeof(float), "head");
     assert(shm);
