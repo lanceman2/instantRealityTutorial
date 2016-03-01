@@ -7,8 +7,11 @@ set -x
 cd "$scriptdir" || exit 1
 
 if [ ! -d CMakeFiles ] ; then
-  cmake . || exit 1
+  cmake\
+ -G"Unix Makefiles"\
+ -DCMAKE_CXX_FLAGS:STRING="-g -Wall -Werror"\
+ || exit 1
 fi
 
-make
+make VERBOSE=1
 

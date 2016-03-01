@@ -6,14 +6,14 @@ builders = $(sort $(wildcard */build.bash))
 
 build:
 ifneq ($(builders),)
-	@for i in $(builders) ; do echo "running: $$i"; $$i ; done
+	@for i in $(builders) ; do echo "running: $$i"; $$i || exit 1 ; done
 else
 	@echo "nothing to build"
 endif
 
 clean:
 ifneq ($(cleaners),)
-	@for i in $(cleaners) ; do echo "running: $$i"; $$i ; done
+	@for i in $(cleaners) ; do echo "running: $$i"; $$i || exit 1 ; done
 else
 	@echo "nothing to clean"
 endif

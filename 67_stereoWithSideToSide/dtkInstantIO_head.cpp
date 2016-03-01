@@ -152,7 +152,6 @@ int DtkHead::processData()
     // time is in millisecond.  Not so regular rate.
     while(waitThread(sleepStep))
     {
-        float ang;
         // Circle x-y dynamics.
         t += sleepStep*0.001F; // t in seconds
         x = amp*cosf(omega*t);
