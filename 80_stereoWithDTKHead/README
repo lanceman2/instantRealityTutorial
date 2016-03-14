@@ -10,3 +10,9 @@ which is not what happens in real life.  In real life your angle of
 view, or view frustum, or visual acuity, stays the same.  You must draw
 some triangles to understand this.
 
+ProjectionViewModifier surface points have to be counterclockwise,
+starting with the lower left corner. 
+
+
+ref:
+http://doc.instantreality.org/tutorial/cave-cluster/
